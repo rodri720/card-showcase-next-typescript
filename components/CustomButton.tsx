@@ -1,5 +1,5 @@
 "use client";
-import  CustomButtonProps  from '@/types';
+import  {CustomButtonProps}  from '@/types';
 
 const CustomButton = ({ title, containerStyles, handleClick, btnType = "button" }: CustomButtonProps) => {
   return (
