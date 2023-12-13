@@ -1,7 +1,8 @@
 import Image from 'next/image'
-import { Hero } from '@/components';
+import { Hero, CustomFilter, SearchBar } from '@/components';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+
 export default function Home() {
   return (
     <main className="overflow-hidden">
@@ -17,7 +18,13 @@ export default function Home() {
           <p>Explore out cars you might like</p>
 
         </div>
-
+        <div className='home__filters'>
+          <SearchBar />
+          <div className='home__filter-container'>
+            <CustomFilter title= "Fuel" />
+            <CustomFilter title= "Year" />
+          </div>
+        </div>
       </div>
       <Footer />
     </main>
