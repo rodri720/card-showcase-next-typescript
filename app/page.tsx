@@ -3,10 +3,17 @@ import { Hero, CustomFilter, SearchBar, carCard } from '@/components';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { fetchCars } from '@/Utils';
+import { carProps } from '@/types';
 
-export default function Home({ allCars }) {
+
+
+interface CarCardProps {
+  car: carProps;
+}
+export default function Home({ allCars}: any) {
   const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
-
+  const all= fetchCars();
+  console.log("hola" )
   return (
     <main className="overflow-hidden">
       <Navbar />
@@ -23,17 +30,18 @@ export default function Home({ allCars }) {
         <div className='home__filters'>
           <SearchBar />
           <div className='home__filter-container'>
-            <CustomFilter title="Fuel" />
-            <CustomFilter title="Year" />
+            {/* <CustomFilter title="Fuel" /> 
+            <CustomFilter title="Year" />*/}
           </div>
         </div>
 
         {!isDataEmpty ? (
           <section>
             <div className="home__cars-wrapper">
-              {allCars?.map((car) => (
+              {allCars?.map((car: any) => (
                 <div key={car.id} className="home__car-wrapper">
-                  <carCard car={car} />
+                  console.log(car)
+                  
                 </div>
               ))}
             </div>
