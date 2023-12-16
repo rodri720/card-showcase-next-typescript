@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { carProps } from '@/types';
+import { CarProps } from '@/types';
 import CustomButton from './CustomButton';
-import { calculateCarRent } from '@/Utils';
+import { calculateCarRent, generateCarImageUrl } from '@/Utils';
 import  CarDetails  from './CarDetails';
 
 interface CarCardProps {
-  car: carProps;
+  car: CarProps;
 }
 
 const CarCard = ({ car }: CarCardProps) => {
@@ -33,7 +33,7 @@ const CarCard = ({ car }: CarCardProps) => {
           </span>
         </p>
         <div className="relative w-full h-40 my-3 object-contain">
-          <Image src="/hero.png"
+          <Image src={generateCarImageUrl(car)}
             
             width={50}
             height={50}

@@ -1,22 +1,78 @@
-'use client'
-import {useState} from 'react'
-import  {SearchManufacturer}  from "./";
+"use client";
 
-const SearchBar = () => {
-    const [manufacturer, setManufacturer] = useState('')
-    const handleSearch = () => {}
+import React, { useState } from 'react';
+import SearchManufacturer from './SearchManufacturer'; // Ajusta la ruta de importación según tu estructura de archivos
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-    
+// Define el componente SearchButton
+const SearchButton = ({ otherClasses }: { otherClasses?: string }) => {
   return (
-   <form className='searchbar' onSubmit={handleSearch}>
-<div className='searchbar__item'>
-<SearchManufacturer 
-manufacturer={manufacturer}
-setManufacturer={setManufacturer}
-/>
-</div>
-   </form>
-  )
+    <button className={otherClasses}>
+      <Image src="/magnifying-glass.svg" alt="search" width={40} height={40} className="object-contain" />
+    </button>
+  );
+};
+
+// Define el componente SearchBar
+const SearchBar = () => {
+  const [manufacturer, setManufacturer] = useState('');
+const [model, setModel] = useState('');
+const router = useRouter();
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    if (manufacturer === '' || model === '') {
+      return alert('Please fill in the search bar');
+    }
+    updateSearchParams(model.toLowerCase(), manufacturer.toLowerCase());
+  };
+
+  const updateSearchParams = (model: string, manufacturer: string) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (model) {
+      searchParams.set('model', model);
+    } else {
+      searchParams.delete('model');
+    }
+    if (manufacturer) {
+      searchParams.set('manufacturer', manufacturer);
+    } else {
+      searchParams.delete('manufacturer');
+    }
+    const newPathName = `${window.location.pathname}?${searchParams.toString()}`;
+
+    router.push (newPathName);
   }
 
-export default SearchBar
+  return (
+    <form className='searchbar' onSubmit={handleSearch}>
+      <div className='searchbar__item'>
+        <SearchManufacturer
+          manufacturer={manufacturer}
+          setManufacturer={setManufacturer}
+        />
+        <SearchButton otherClasses="sm:hidden" />
+        <Image
+          src="/model-icon.png"
+          width={25}
+          height={25}
+          className="absolute w-[20px] h-[20px] ml-4"
+          alt="car model"
+        />
+        <input
+          type="text"
+          name="model"
+          value={model}
+          onChange={(e) => setModel(e.target.value)}
+          placeholder="Tiguan"
+          className="searchbar__input"
+          />
+        <SearchButton otherClasses="sm:hidden" />
+      </div>
+      <SearchButton otherClasses="max-sm:hidden" />
+    </form>
+  );
+};
+
+export default SearchBar;
