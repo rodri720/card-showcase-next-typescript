@@ -1,19 +1,49 @@
-import Image from 'next/image';
-import { Hero, CustomFilter, SearchBar, carCard } from '@/components';
+"use client";
+
+import { useEffect, useState } from 'react';
+import { Hero, CustomFilter, SearchBar, CarCard, ShowMore } from '@/components';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { fetchCars } from '@/Utils';
-import { carProps } from '@/types';
+import { CarProps } from '@/types';
+import { fuels, yearsOfProduction } from '@/constants';
+import { useFormState } from 'react-dom';
 
 
+export default function Home({ }) {
+ const [ allCars, setAllCars ] = useState([]);
+ const [ loading, setLoading ] = useState(false);
 
-interface CarCardProps {
-  car: carProps;
+ const  [ manufacturer, setManufacturer ] = useState("");
+ const  [ model, setModel ] = useState("");
+
+ const [ fuel, setFuel ] = useState("");
+ const [ year, setYear ] = useState(202);
+
+ const [ limit, setLimit ] = useState(10);
+const getCars = async () => {
+  setLoading(true);
+  try {
+    const result = await fetchCars({
+      manufacturer: manufacturer || "",
+      year: year || 2022,
+      fuel: fuel || "",
+      limit: limit || 10,
+      model: model || "",
+    });
+    setAllCars(result);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
 }
-export default function Home({ allCars}: any) {
+ useEffect(() => {
+   getCars();
+ }, [fuel, year, limit, manufacturer, model])
+
   const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
-  const all= fetchCars();
-  console.log("hola" )
+
   return (
     <main className="overflow-hidden">
       <Navbar />
@@ -21,17 +51,16 @@ export default function Home({ allCars}: any) {
 
       <div className="mt-12 padding-x padding-y max-width" id="discover">
         <div className="home__text-container">
-          <h1 className="text-4xl font-extrabold">
-            Catalogo
-          </h1>
+          <h1 className="text-4xl font-extrabold">Catalogo</h1>
           <p>Explora nuestros autos que te podrían gustar</p>
         </div>
 
-        <div className='home__filters'>
+        <div className="home__filters">
           <SearchBar />
-          <div className='home__filter-container'>
-            {/* <CustomFilter title="Fuel" /> 
-            <CustomFilter title="Year" />*/}
+          <div className="home__filter-container">
+            <CustomFilter title="Fuel" options={fuels} />
+            <CustomFilter title="Year" options={yearsOfProduction} />
+            {/* Asegúrate de que estás utilizando el array correcto en lugar de {yearsOfProduction} */}
           </div>
         </div>
 
@@ -39,11 +68,15 @@ export default function Home({ allCars}: any) {
           <section>
             <div className="home__cars-wrapper">
               {allCars?.map((car: any) => (
-                <div key={car.id} className="home__car-wrapper">
-                  console.log(car)
-                  
-                </div>
+                <CarCard car={car} key={car.id} />
               ))}
+              <div>
+                <ShowMore 
+                  pageNumber={(searchParams.limit || 10) / 10}
+                  isNext={(searchParams.limit || 10) >
+                  allCars.length}
+                />
+              </div>
             </div>
           </section>
         ) : (
@@ -59,13 +92,3 @@ export default function Home({ allCars}: any) {
     </main>
   );
 }
-
-// Agrega la lógica para obtener los datos en el servidor (por ejemplo, usando getStaticProps o getServerSideProps)
-// y pasa los datos como propiedades a este componente.
-// Por ejemplo:
-// export async function getStaticProps() {
-//   const allCars = await fetchCars();
-//   return {
-//     props: { allCars },
-//   };
-// }

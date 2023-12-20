@@ -1,4 +1,4 @@
-import  {CarProps} from '@/types';
+import { CarProps, FilterProps } from '@/types';
 import axios from 'axios';
 
 const url = 'https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?model=audi';
@@ -26,20 +26,25 @@ async function fetchData() {
 // Llamada a la función principal
 fetchData();
 
-export async function fetchCars() {
+export async function fetchCars(filters: FilterProps) {
+    const { manufacturer, year, model, limit, fuel } = filters;
     const headers = {
         'X-RapidAPI-Key': '3a7a6e6e90mshb7f5d9a7d4c5f7cp1b0b5djsn3b6a7a7a7a7a',
         'X-RapidAPI-Host': 'cars-by-api-ninjas.p.rapidapi.com'
     };
 
     try {
-        const response = await fetch('https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?model=audi', {
-            headers: headers,
+        const response = await fetch(`https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&year=${year}&model=${model}&limit=${limit}&fuel_type=${fuel}`, {
+            headers: {
+                ...headers,
+            },
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        // if (!response.ok) {
+        //     const errorMessage = `HTTP error! Status: ${response.status}, ${response.statusText}`;
+        //     const errorText = await response.text();
+        //     throw new Error(`${errorMessage}\n${errorText}`);
+        // }
 
         const result = await response.json();
         return result;
@@ -57,8 +62,8 @@ export const calculateCarRent = (city_mpg: number, year: number) => {
     const ageRate = (new Date().getFullYear() - year) * ageFactor;
     const rentalRatePerDay = basePricePerDay + mileageRate + ageRate;
     return rentalRatePerDay.toFixed(0);
-}
- 
+};
+
 export const generateCarImageUrl = (car: CarProps, angle?: string) => {
     const url = new URL('https://cdn.imagin.studio/getimage');
     const { make, model, year } = car;
@@ -68,6 +73,14 @@ export const generateCarImageUrl = (car: CarProps, angle?: string) => {
     url.searchParams.append('make', make);
     url.searchParams.append('zommType', 'fullscreen');
     url.searchParams.append('angle', `${angle}`);
-    
+
     return url.href;
-}
+};
+
+export const updateSearchParams = (type: string, value: string) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set(type, value);
+
+    const newPathName = `${window.location.pathname}?${searchParams.toString()}`;
+    return newPathName;
+};
